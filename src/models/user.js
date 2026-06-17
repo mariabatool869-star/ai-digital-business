@@ -1,44 +1,48 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
-// This defines what a User looks like in the database
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: true  // User MUST have a name
+    required: true
   },
   email: {
     type: String,
-    required: true,  // User MUST have an email
-    unique: true     // No two users can have same email
+    required: true,
+    unique: true
   },
   password: {
     type: String,
-    required: true   // User MUST have a password
+    required: true
   },
   role: {
     type: String,
-    enum: ['customer', 'admin'],  // Only these two roles allowed
-    default: 'customer'           // New users are customers by default
+    enum: ['customer', 'admin'],
+    default: 'customer'
   },
   createdAt: {
     type: Date,
-    default: Date.now  // Automatically sets the date
+    default: Date.now
   }
 });
 
-// This runs BEFORE saving a user to the database
-// It encrypts (hashes) the password
+// Hash password before saving - FIXED VERSION
 userSchema.pre('save', async function(next) {
-  if (!this.isModified('password')) return next();  // If password isn't changed, skip
-  this.password = await bcrypt.hash(this.password, 10);  // Encrypt password
-  next();
+  try {
+    if (!this.isModified('password')) {
+      return next();
+    }
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+    next();
+  } catch (error) {
+    next(error);
+  }
 });
 
-// This is a function that checks if a password is correct
+// Compare password method
 userSchema.methods.comparePassword = async function(candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
 };
 
-// Export the model so other files can use it
 module.exports = mongoose.model('User', userSchema);
