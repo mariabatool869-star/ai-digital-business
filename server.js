@@ -3,7 +3,6 @@ console.log("🚀 Server starting...");
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const path = require('path');
 
 const app = express();
 
@@ -11,27 +10,21 @@ app.use(cors());
 app.use(express.json());
 
 // MongoDB connection
-const MONGODB_URI = process.env.MONGODB_URI;
-
-if (!MONGODB_URI) {
-  console.error('❌ MONGODB_URI is not set');
-} else {
-  mongoose.connect(MONGODB_URI)
-    .then(() => console.log('✅ Connected to MongoDB Atlas'))
-    .catch(err => console.error('❌ MongoDB error:', err.message));
-}
+mongoose.connect(process.env.MONGODB_URI)
+  .then(() => console.log('✅ Connected to MongoDB Atlas'))
+  .catch(err => console.error('❌ MongoDB error:', err.message));
 
 // Test route
 app.get('/', (req, res) => {
   res.json({ message: '🚀 AI Digital Business API is LIVE!' });
 });
 
-// Import models - use require with path
+// Import models and routes
 const User = require('./src/models/User');
 console.log('✅ User model loaded');
 
-// Import routes
 const authRoutes = require('./src/routes/authRoutes');
 app.use('/api/auth', authRoutes);
 
+// Export for Vercel
 module.exports = app;
