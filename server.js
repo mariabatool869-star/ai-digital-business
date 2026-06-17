@@ -6,7 +6,6 @@ const cors = require('cors');
 
 const app = express();
 
-// Middleware
 app.use(cors());
 app.use(express.json());
 
@@ -20,9 +19,8 @@ app.get('/', (req, res) => {
   res.json({ message: '🚀 AI Digital Business API is LIVE!' });
 });
 
-// Routes
+// Import routes
 const authRoutes = require('./src/routes/authRoutes');
 app.use('/api/auth', authRoutes);
 
-// Export for Vercel - NO error handler with next
 module.exports = app;
