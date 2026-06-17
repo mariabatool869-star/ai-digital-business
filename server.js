@@ -1,3 +1,4 @@
+require('dotenv').config();
 console.log("🚀 Server starting...");
 
 const express = require('express');
@@ -19,8 +20,18 @@ app.get('/', (req, res) => {
   res.json({ message: '🚀 AI Digital Business API is LIVE!' });
 });
 
-// Import routes
+// Import routes - ONLY ONCE!
 const authRoutes = require('./src/routes/authRoutes');
+const productRoutes = require('./src/routes/productRoutes');
+
+// Use routes
 app.use('/api/auth', authRoutes);
+app.use('/api/products', productRoutes);
+
+// Import models (for verification)
+const Product = require('./src/models/Product');
+console.log('✅ Product model loaded');
+
+console.log('MONGODB_URI:', process.env.MONGODB_URI);
 
 module.exports = app;
