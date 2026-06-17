@@ -20,9 +20,8 @@ app.get('/', (req, res) => {
   res.json({ message: '🚀 AI Digital Business API is LIVE!' });
 });
 
-// Routes
+// Routes - MAKE SURE THIS LINE IS CORRECT
 const authRoutes = require('./src/routes/authRoutes');
 app.use('/api/auth', authRoutes);
 
-// Export for Vercel
 module.exports = app;
