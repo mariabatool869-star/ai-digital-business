@@ -1,18 +1,57 @@
-// 1. IMPORT EXPRESS (for routing)
-const express = require('express');
+const User = require('../models/User');
+const jwt = require('jsonwebtoken');
 
-// 2. IMPORT THE AUTH CONTROLLER (the functions we just created)
-const { register, login } = require('../controllers/authController');
+const generateToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: '30d'
+  });
+};
 
-// 3. CREATE A ROUTER (this handles different URLs)
-const router = express.Router();
+exports.register = async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
 
-// 4. DEFINE ROUTES
-// When someone visits /api/auth/register with POST, run the register function
-router.post('/register', register);
+    const userExists = await User.findOne({ email });
+    if (userExists) {
+      return res.status(400).json({ message: 'User already exists' });
+    }
 
-// When someone visits /api/auth/login with POST, run the login function
-router.post('/login', login);
+    const user = await User.create({ name, email, password });
 
-// 5. EXPORT THE ROUTER so server.js can use it
-module.exports = router;
+    res.status(201).json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      token: generateToken(user._id)
+    });
+  } catch (error) {
+    console.error('Register error:', error.message);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(401).json({ message: 'Invalid email or password' });
+    }
+
+    const isPasswordMatch = await user.comparePassword(password);
+    if (!isPasswordMatch) {
+      return res.status(401).json({ message: 'Invalid email or password' });
+    }
+
+    res.json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      token: generateToken(user._id)
+    });
+  } catch (error) {
+    console.error('Login error:', error.message);
+    res.status(500).json({ message: error.message });
+  }
+};
