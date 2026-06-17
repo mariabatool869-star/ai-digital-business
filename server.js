@@ -35,3 +35,5 @@ console.log('✅ Product model loaded');
 console.log('MONGODB_URI:', process.env.MONGODB_URI);
 
 module.exports = app;
+const path = require('path');
+app.use(express.static(path.join(__dirname, 'public')));
