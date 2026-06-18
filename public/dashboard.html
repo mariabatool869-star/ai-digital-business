@@ -101,6 +101,13 @@
         .status-inactive { background: rgba(239,68,68,0.15); color: #ef4444; }
         .status-admin { background: rgba(168,85,247,0.15); color: #a855f7; }
         .status-user { background: rgba(59,130,246,0.15); color: #3b82f6; }
+        .status-pending { background: rgba(249,115,22,0.15); color: #f97316; }
+        .status-processing { background: rgba(59,130,246,0.15); color: #3b82f6; }
+        .status-completed { background: rgba(34,197,94,0.15); color: #22c55e; }
+        .status-cancelled { background: rgba(239,68,68,0.15); color: #ef4444; }
+        .chart-bars { display:flex;align-items:flex-end;gap:8px;height:120px;margin-top:12px; }
+        .chart-bar { flex:1;background:linear-gradient(180deg,#a855f7,#2dd4bf);border-radius:4px 4px 0 0;min-height:4px;position:relative; }
+        .chart-bar label { position:absolute;bottom:-20px;left:50%;transform:translateX(-50%);font-size:10px;color:#94a3b8;white-space:nowrap; }
 
         .empty-state { text-align: center; padding: 30px; color: #64748b; }
         .empty-state i { font-size: 36px; color: #2a2a3a; margin-bottom: 10px; }
@@ -174,8 +181,20 @@
             </div>
 
             <div class="card">
-                <div class="card-title">📦 Recent Activity <span class="badge-count">Live</span></div>
-                <div id="recentActivity"><div class="empty-state"><i class="fas fa-clock"></i><p>No recent activity</p></div></div>
+                <div class="card-title">📦 Recent Orders <span class="badge-count">Live</span></div>
+                <div id="recentActivity"><div class="empty-state"><i class="fas fa-clock"></i><p>Loading...</p></div></div>
+            </div>
+            <div class="card">
+                <div class="card-title">📈 Revenue (6 months)</div>
+                <div class="chart-bars" id="revenueChart"></div>
+            </div>
+            <div class="card">
+                <div class="card-title">👥 User Growth</div>
+                <div class="chart-bars" id="userChart"></div>
+            </div>
+            <div class="card">
+                <div class="card-title">🏆 Top Selling Products</div>
+                <div id="topProducts"><div class="empty-state"><i class="fas fa-chart-bar"></i><p>Loading...</p></div></div>
             </div>
         </div>
 
@@ -198,6 +217,8 @@
                             </select>
                         </div>
                         <div class="full"><label>Description</label><input type="text" id="productDesc" placeholder="Brief description" required /></div>
+                        <div><label>Image URL</label><input type="url" id="productImage" placeholder="https://example.com/image.png" /></div>
+                        <div><label>Stock</label><input type="number" id="productStock" placeholder="100" min="0" value="100" /></div>
                         <div class="full"><label>Features (comma separated)</label><input type="text" id="productFeatures" placeholder="24/7 support, Free SSL" /></div>
                     </div>
                     <button type="submit" class="btn-primary">➕ Add Product</button>
@@ -209,8 +230,8 @@
                 <div class="card-title"><i class="fas fa-cube"></i> All Products <span class="badge-count" id="productCount">0</span></div>
                 <div class="table-wrap">
                     <table>
-                        <thead><tr><th>Name</th><th>Price</th><th>Type</th><th>Status</th><th>Actions</th></tr></thead>
-                        <tbody id="productTableBody"><tr><td colspan="5" class="empty-state"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr></tbody>
+                        <thead><tr><th>Name</th><th>Price</th><th>Type</th><th>Stock</th><th>Status</th><th>Actions</th></tr></thead>
+                        <tbody id="productTableBody"><tr><td colspan="6" class="empty-state"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr></tbody>
                     </table>
                 </div>
             </div>
@@ -253,8 +274,8 @@
                 <div class="card-title"><i class="fas fa-shopping-cart"></i> All Orders <span class="badge-count" id="orderCount">0</span></div>
                 <div class="table-wrap">
                     <table>
-                        <thead><tr><th>Order ID</th><th>Customer</th><th>Product</th><th>Amount</th><th>Status</th></tr></thead>
-                        <tbody id="orderTableBody"><tr><td colspan="5" class="empty-state"><i class="fas fa-inbox"></i> No orders yet</td></tr></tbody>
+                        <thead><tr><th>Order ID</th><th>Customer</th><th>Items</th><th>Amount</th><th>Status</th><th>Update</th></tr></thead>
+                        <tbody id="orderTableBody"><tr><td colspan="6" class="empty-state"><i class="fas fa-inbox"></i> No orders yet</td></tr></tbody>
                     </table>
                 </div>
             </div>
@@ -359,17 +380,18 @@
 
     async function loadProducts() {
         try {
-            const res = await fetch(`${API_URL}/products`);
+            const res = await fetch(`${API_URL}/products/admin/all`, { headers: { Authorization: `Bearer ${getToken()}` } });
             const products = await res.json();
             const tbody = document.getElementById('productTableBody');
-            if (products.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="empty-state"><i class="fas fa-box-open"></i> No products</td></tr>`;
+            if (!products.length) {
+                tbody.innerHTML = `<tr><td colspan="6" class="empty-state"><i class="fas fa-box-open"></i> No products</td></tr>`;
             } else {
                 tbody.innerHTML = products.map(p => `
                     <tr>
-                        <td><strong>${p.name}</strong></td>
+                        <td><strong>${p.name}</strong>${p.image ? `<br><img src="${p.image}" style="height:30px;margin-top:4px;border-radius:4px;" onerror="this.style.display='none'">` : ''}</td>
                         <td>$${p.price}</td>
                         <td>${p.type}</td>
+                        <td>${p.stock ?? '—'}</td>
                         <td><span class="status ${p.isActive ? 'status-active' : 'status-inactive'}">${p.isActive ? 'Active' : 'Inactive'}</span></td>
                         <td>
                             <button class="btn-edit" onclick="editProduct('${p._id}')"><i class="fas fa-edit"></i></button>
@@ -380,18 +402,16 @@
             }
             document.getElementById('productCount').textContent = products.length;
         } catch {
-            document.getElementById('productTableBody').innerHTML = `<tr><td colspan="5" class="empty-state"><i class="fas fa-exclamation-triangle"></i> Error</td></tr>`;
+            document.getElementById('productTableBody').innerHTML = `<tr><td colspan="6" class="empty-state"><i class="fas fa-exclamation-triangle"></i> Error</td></tr>`;
         }
     }
 
     async function loadUsers() {
         try {
-            const users = [
-                { _id: '1', name: 'Admin User', email: 'admin@azlanai.com', role: 'admin' },
-                { _id: '2', name: 'Test User', email: 'test@example.com', role: 'user' }
-            ];
+            const res = await fetch(`${API_URL}/users`, { headers: { Authorization: `Bearer ${getToken()}` } });
+            const users = await res.json();
             const tbody = document.getElementById('userTableBody');
-            if (users.length === 0) {
+            if (!users.length) {
                 tbody.innerHTML = `<tr><td colspan="4" class="empty-state"><i class="fas fa-users"></i> No users</td></tr>`;
             } else {
                 tbody.innerHTML = users.map(u => `
@@ -399,10 +419,7 @@
                         <td><strong>${u.name}</strong></td>
                         <td>${u.email}</td>
                         <td><span class="status ${u.role === 'admin' ? 'status-admin' : 'status-user'}">${u.role}</span></td>
-                        <td>
-                            <button class="btn-edit"><i class="fas fa-edit"></i></button>
-                            <button class="btn-danger"><i class="fas fa-trash"></i></button>
-                        </td>
+                        <td><button class="btn-danger" onclick="deleteUser('${u._id}')"><i class="fas fa-trash"></i></button></td>
                     </tr>
                 `).join('');
             }
@@ -412,49 +429,99 @@
         }
     }
 
+    async function deleteUser(id) {
+        if (!confirm('Delete this user?')) return;
+        const res = await fetch(`${API_URL}/users/${id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${getToken()}` } });
+        if (res.ok) { loadUsers(); loadDashboard(); } else alert('Error deleting user');
+    }
+
     async function loadOrders() {
-        const orders = [
-            { _id: 'ORD-001', customer: 'John Doe', product: 'Premium Hosting', amount: '$49.99', status: 'Completed' },
-            { _id: 'ORD-002', customer: 'Sarah Miller', product: '.com Domain', amount: '$12.99', status: 'Pending' }
-        ];
-        const tbody = document.getElementById('orderTableBody');
-        if (orders.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="5" class="empty-state"><i class="fas fa-inbox"></i> No orders</td></tr>`;
-        } else {
-            tbody.innerHTML = orders.map(o => `
-                <tr>
-                    <td><strong>${o._id}</strong></td>
-                    <td>${o.customer}</td>
-                    <td>${o.product}</td>
-                    <td>${o.amount}</td>
-                    <td><span class="status ${o.status === 'Completed' ? 'status-active' : 'status-pending'}">${o.status}</span></td>
-                </tr>
-            `).join('');
+        try {
+            const res = await fetch(`${API_URL}/orders`, { headers: { Authorization: `Bearer ${getToken()}` } });
+            const orders = await res.json();
+            const tbody = document.getElementById('orderTableBody');
+            if (!orders.length) {
+                tbody.innerHTML = `<tr><td colspan="6" class="empty-state"><i class="fas fa-inbox"></i> No orders</td></tr>`;
+            } else {
+                tbody.innerHTML = orders.map(o => `
+                    <tr>
+                        <td><strong>#${o._id.toString().slice(-8).toUpperCase()}</strong></td>
+                        <td>${o.customerName || o.user?.name || '—'}</td>
+                        <td>${o.items.map(i => i.name).join(', ')}</td>
+                        <td>$${o.totalAmount.toFixed(2)}</td>
+                        <td><span class="status status-${o.status}">${o.status}</span></td>
+                        <td>
+                            <select onchange="updateOrderStatus('${o._id}', this.value)" style="background:#1e293b;color:#fff;border:1px solid #334155;border-radius:4px;padding:4px;font-size:11px;">
+                                <option value="pending" ${o.status==='pending'?'selected':''}>Pending</option>
+                                <option value="processing" ${o.status==='processing'?'selected':''}>Processing</option>
+                                <option value="completed" ${o.status==='completed'?'selected':''}>Completed</option>
+                                <option value="cancelled" ${o.status==='cancelled'?'selected':''}>Cancelled</option>
+                            </select>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+            document.getElementById('orderCount').textContent = orders.length;
+        } catch {
+            document.getElementById('orderTableBody').innerHTML = `<tr><td colspan="6" class="empty-state"><i class="fas fa-exclamation-triangle"></i> Error</td></tr>`;
         }
-        document.getElementById('orderCount').textContent = orders.length;
+    }
+
+    async function updateOrderStatus(id, status) {
+        await fetch(`${API_URL}/orders/${id}/status`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
+            body: JSON.stringify({ status })
+        });
+        loadOrders();
+    }
+
+    function renderChart(elId, data, valueKey) {
+        const el = document.getElementById(elId);
+        const max = Math.max(...data.map(d => d[valueKey]), 1);
+        el.innerHTML = data.map(d => `
+            <div class="chart-bar" style="height:${Math.max(4, (d[valueKey]/max)*100)}%;" title="${d[valueKey]}">
+                <label>${d.month}</label>
+            </div>
+        `).join('');
     }
 
     async function loadDashboard() {
         try {
-            const res = await fetch(`${API_URL}/products`);
-            const products = await res.json();
-            document.getElementById('totalProducts').textContent = products.length;
-            document.getElementById('totalRevenue').textContent = `$${products.reduce((s, p) => s + p.price, 0).toFixed(2)}`;
-            document.getElementById('totalUsers').textContent = '2';
-            document.getElementById('totalOrders').textContent = '2';
+            const res = await fetch(`${API_URL}/analytics`, { headers: { Authorization: `Bearer ${getToken()}` } });
+            const data = await res.json();
+            document.getElementById('totalProducts').textContent = data.totalProducts;
+            document.getElementById('totalUsers').textContent = data.totalUsers;
+            document.getElementById('totalOrders').textContent = data.totalOrders;
+            document.getElementById('totalRevenue').textContent = `$${data.totalRevenue.toFixed(2)}`;
 
             const activity = document.getElementById('recentActivity');
-            if (products.length > 0) {
-                activity.innerHTML = products.slice(0, 3).map(p => `
+            if (data.recentOrders?.length) {
+                activity.innerHTML = data.recentOrders.map(o => `
                     <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.03);">
-                        <span>📦 <strong>${p.name}</strong></span>
-                        <span style="color:#94a3b8;font-size:12px;">$${p.price}</span>
+                        <span>🛒 <strong>${o.customerName}</strong> — ${o.items[0]?.name || 'Order'}</span>
+                        <span style="color:#94a3b8;font-size:12px;">$${o.totalAmount.toFixed(2)}</span>
                     </div>
                 `).join('');
             } else {
-                activity.innerHTML = `<div class="empty-state"><i class="fas fa-clock"></i><p>No recent activity</p></div>`;
+                activity.innerHTML = `<div class="empty-state"><i class="fas fa-clock"></i><p>No recent orders</p></div>`;
             }
-        } catch { /* silent fail */ }
+
+            renderChart('revenueChart', data.monthlyRevenue, 'revenue');
+            renderChart('userChart', data.userGrowth, 'users');
+
+            const top = document.getElementById('topProducts');
+            if (data.topProducts?.length) {
+                top.innerHTML = data.topProducts.map((p, i) => `
+                    <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.03);">
+                        <span>${i+1}. ${p.name}</span>
+                        <span style="color:#a855f7;">$${p.revenue.toFixed(2)} (${p.count} sold)</span>
+                    </div>
+                `).join('');
+            } else {
+                top.innerHTML = `<div class="empty-state"><i class="fas fa-chart-bar"></i><p>No sales yet</p></div>`;
+            }
+        } catch { /* silent */ }
     }
 
     document.getElementById('addProductForm').addEventListener('submit', async (e) => {
@@ -464,13 +531,15 @@
         const description = document.getElementById('productDesc').value;
         const type = document.getElementById('productType').value;
         const features = document.getElementById('productFeatures').value.split(',').map(f => f.trim()).filter(f => f);
+        const image = document.getElementById('productImage').value;
+        const stock = parseInt(document.getElementById('productStock').value, 10) || 100;
         const msg = document.getElementById('addProductMsg');
         msg.className = 'msg'; msg.style.display = 'none';
         try {
             const res = await fetch(`${API_URL}/products`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
-                body: JSON.stringify({ name, price, description, type, features, isActive: true })
+                body: JSON.stringify({ name, price, description, type, features, image, stock, isActive: true })
             });
             const data = await res.json();
             if (res.ok) {
@@ -494,9 +563,9 @@
         const msg = document.getElementById('addUserMsg');
         msg.className = 'msg'; msg.style.display = 'none';
         try {
-            const res = await fetch(`http://localhost:5000/api/auth/register`, {
+            const res = await fetch(`${API_URL}/users`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
                 body: JSON.stringify({ name, email, password, role })
             });
             const data = await res.json();

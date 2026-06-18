@@ -60,6 +60,7 @@
         .service-card {
             background: #fff; border: 1px solid #e2e8f0; border-radius: 12px;
             padding: 24px 20px; text-align: center; transition: all 0.3s;
+            text-decoration: none; color: inherit; display: block; cursor: pointer;
         }
         .service-card:hover { box-shadow: 0 8px 25px rgba(0,0,0,0.06); transform: translateY(-3px); }
         .service-card .icon-circle {
@@ -90,12 +91,48 @@
         .product-item .name { font-weight: 600; }
         .product-item .price { color: #a855f7; font-weight: 600; }
         .product-item .status { padding: 2px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; background: rgba(34,197,94,0.1); color: #22c55e; }
+        .btn-buy {
+            background: linear-gradient(90deg, #2dd4bf, #a855f7); color: #fff; border: none;
+            padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 12px;
+            font-weight: 600; font-family: 'Inter', sans-serif; transition: all 0.2s;
+        }
+        .btn-buy:hover { transform: scale(1.05); }
+        .cart-link-top {
+            position: relative; color: #64748b; text-decoration: none; font-size: 18px; padding: 6px;
+        }
+        .cart-badge {
+            position: absolute; top: -2px; right: -6px;
+            background: linear-gradient(90deg, #2dd4bf, #a855f7); color: #fff;
+            font-size: 10px; font-weight: 700; width: 18px; height: 18px;
+            border-radius: 50%; display: none; align-items: center; justify-content: center;
+        }
 
         .empty-state { text-align: center; padding: 40px; color: #94a3b8; }
         .empty-state i { font-size: 40px; color: #e2e8f0; margin-bottom: 12px; }
 
         .back-link { color: #64748b; text-decoration: none; font-size: 14px; transition: color 0.3s; }
         .back-link:hover { color: #0f172a; }
+
+        .tabs { display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap; }
+        .tab-btn { padding:8px 18px;border:1px solid #e2e8f0;background:#fff;border-radius:8px;cursor:pointer;font-weight:600;font-size:13px;font-family:inherit;color:#64748b; }
+        .tab-btn.active { background:linear-gradient(90deg,#2dd4bf,#a855f7);color:#fff;border-color:transparent; }
+        .tab-panel { display:none; } .tab-panel.active { display:block; }
+
+        .profile-card, .orders-card { background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:24px;margin-bottom:20px; }
+        .profile-card h3, .orders-card h3 { font-size:18px;margin-bottom:16px; }
+        .form-row { margin-bottom:14px; }
+        .form-row label { display:block;font-size:13px;color:#64748b;margin-bottom:4px;font-weight:500; }
+        .form-row input { width:100%;padding:10px 14px;border:1px solid #e2e8f0;border-radius:8px;font-family:inherit;font-size:14px; }
+        .btn-save { background:linear-gradient(90deg,#2dd4bf,#a855f7);color:#fff;border:none;padding:10px 20px;border-radius:8px;font-weight:600;cursor:pointer;font-family:inherit; }
+        .order-row { display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid #e2e8f0;flex-wrap:wrap;gap:8px; }
+        .order-status { padding:3px 12px;border-radius:20px;font-size:11px;font-weight:600; }
+        .status-pending { background:rgba(249,115,22,0.1);color:#f97316; }
+        .status-processing { background:rgba(59,130,246,0.1);color:#3b82f6; }
+        .status-completed { background:rgba(34,197,94,0.1);color:#22c55e; }
+        .status-cancelled { background:rgba(239,68,68,0.1);color:#ef4444; }
+        .msg { margin-top:10px;font-size:13px;padding:8px;border-radius:6px;display:none; }
+        .msg.ok { display:block;background:rgba(34,197,94,0.1);color:#22c55e; }
+        .msg.err { display:block;background:rgba(239,68,68,0.1);color:#ef4444; }
 
         @media (max-width: 768px) {
             .topbar { padding: 12px 16px; }
@@ -112,6 +149,10 @@
     <div class="topbar">
         <div class="logo"><i class="fas fa-crown"></i> Azlan<span>AI</span></div>
         <div class="user-section">
+            <a href="/checkout.html" class="cart-link-top" title="Cart">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="cart-badge">0</span>
+            </a>
             <span id="userName">User</span>
             <div class="avatar" id="userAvatar">U</div>
             <span class="badge" id="userRoleBadge">👤 User</span>
@@ -129,9 +170,15 @@
             <p>Your all-in-one digital business platform</p>
         </div>
 
-        <!-- ===== QUICK STATS ===== -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchPanel('overview')">Overview</button>
+            <button class="tab-btn" onclick="switchPanel('orders')">My Orders</button>
+            <button class="tab-btn" onclick="switchPanel('profile')">Profile</button>
+        </div>
+
+        <div id="panel-overview" class="tab-panel active">
         <div class="stats-grid">
-            <div class="stat-card"><div class="icon"><i class="fas fa-box"></i></div><div class="number" id="totalProducts">0</div><div class="label">Products Available</div></div>
+            <div class="stat-card" style="cursor:pointer;" onclick="window.location.href='/products.html'"><div class="icon"><i class="fas fa-box"></i></div><div class="number" id="totalProducts">0</div><div class="label">Products Available</div></div>
             <div class="stat-card"><div class="icon"><i class="fas fa-robot"></i></div><div class="number">5</div><div class="label">AI Agents</div></div>
             <div class="stat-card"><div class="icon"><i class="fas fa-globe"></i></div><div class="number">3</div><div class="label">Domains</div></div>
             <div class="stat-card"><div class="icon"><i class="fas fa-calendar"></i></div><div class="number" id="memberSince">Today</div><div class="label">Member Since</div></div>
@@ -141,57 +188,177 @@
         <div class="services-section">
             <h2><i class="fas fa-bolt"></i> Your Services</h2>
             <div class="services-grid">
-                <div class="service-card">
+                <a href="/products.html?type=ai_agent" class="service-card">
                     <div class="icon-circle icon-purple"><i class="fas fa-robot"></i></div>
                     <h3>AI Sales Agent</h3>
                     <p>24/7 automated sales assistant</p>
-                    <span class="tag">Active</span>
-                </div>
-                <div class="service-card">
+                    <span class="tag">Browse</span>
+                </a>
+                <a href="/products.html?type=ai_agent" class="service-card">
                     <div class="icon-circle icon-blue"><i class="fas fa-headset"></i></div>
                     <h3>AI Support Agent</h3>
                     <p>Instant customer support</p>
-                    <span class="tag">Active</span>
-                </div>
-                <div class="service-card">
+                    <span class="tag">Browse</span>
+                </a>
+                <a href="/products.html?type=ai_agent" class="service-card">
                     <div class="icon-circle icon-green"><i class="fas fa-chart-line"></i></div>
                     <h3>AI Marketing Agent</h3>
                     <p>Smart marketing automation</p>
-                    <span class="tag">Active</span>
-                </div>
-                <div class="service-card">
+                    <span class="tag">Browse</span>
+                </a>
+                <a href="/products.html?type=ai_agent" class="service-card">
                     <div class="icon-circle icon-orange"><i class="fas fa-code"></i></div>
                     <h3>AI Developer Agent</h3>
                     <p>Code & deployment assistant</p>
-                    <span class="tag">Active</span>
-                </div>
-                <div class="service-card">
+                    <span class="tag">Browse</span>
+                </a>
+                <a href="/products.html?type=ai_agent" class="service-card">
                     <div class="icon-circle icon-cyan"><i class="fas fa-chart-pie"></i></div>
                     <h3>AI Analytics Agent</h3>
                     <p>Business insights & reports</p>
-                    <span class="tag">Active</span>
-                </div>
-                <div class="service-card">
+                    <span class="tag">Browse</span>
+                </a>
+                <a href="/products.html?type=hosting" class="service-card">
                     <div class="icon-circle icon-pink"><i class="fas fa-server"></i></div>
                     <h3>Hosting & Domains</h3>
                     <p>Fast, reliable hosting</p>
-                    <span class="tag">Active</span>
-                </div>
+                    <span class="tag">Browse</span>
+                </a>
             </div>
         </div>
 
         <!-- ===== PRODUCTS ===== -->
-        <h2 style="font-size:20px;font-weight:700;margin-bottom:16px;"><i class="fas fa-cube" style="color:#a855f7;"></i> Available Products</h2>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+            <h2 style="font-size:20px;font-weight:700;"><a href="/products.html" style="color:inherit;text-decoration:none;"><i class="fas fa-cube" style="color:#a855f7;"></i> Available Products</a></h2>
+            <a href="/products.html" style="color:#a855f7;font-size:14px;font-weight:600;text-decoration:none;">View All →</a>
+        </div>
         <div class="product-list" id="productList">
             <div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>Loading products...</p></div>
+        </div>
+        </div>
+
+        <div id="panel-orders" class="tab-panel">
+            <div class="orders-card">
+                <h3><i class="fas fa-shopping-bag" style="color:#a855f7;"></i> Order History</h3>
+                <div id="ordersList"><div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>Loading orders...</p></div></div>
+            </div>
+        </div>
+
+        <div id="panel-profile" class="tab-panel">
+            <div class="profile-card">
+                <h3><i class="fas fa-user" style="color:#a855f7;"></i> Edit Profile</h3>
+                <div class="form-row"><label>Name</label><input type="text" id="profileName" /></div>
+                <div class="form-row"><label>Email</label><input type="email" id="profileEmail" disabled style="background:#f8fafc;" /></div>
+                <div class="form-row"><label>Phone</label><input type="text" id="profilePhone" placeholder="Optional" /></div>
+                <button class="btn-save" onclick="saveProfile()">Save Profile</button>
+                <div class="msg" id="profileMsg"></div>
+            </div>
+            <div class="profile-card">
+                <h3><i class="fas fa-lock" style="color:#a855f7;"></i> Change Password</h3>
+                <div class="form-row"><label>Current Password</label><input type="password" id="currentPassword" /></div>
+                <div class="form-row"><label>New Password</label><input type="password" id="newPassword" /></div>
+                <button class="btn-save" onclick="changePassword()">Update Password</button>
+                <div class="msg" id="passwordMsg"></div>
+            </div>
         </div>
 
     </div>
 
+    <script src="/js/cart.js"></script>
     <script>
         const API_URL = window.location.hostname === 'localhost'
             ? 'http://localhost:5000/api'
             : 'https://ai-digital-business.vercel.app/api';
+
+        function switchPanel(name) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            document.getElementById('panel-' + name).classList.add('active');
+            event.target.classList.add('active');
+            if (name === 'orders') loadOrders();
+            if (name === 'profile') loadProfile();
+        }
+
+        async function loadProfile() {
+            try {
+                const res = await fetch(`${API_URL}/auth/profile`, { headers: { Authorization: `Bearer ${getToken()}` } });
+                const data = await res.json();
+                if (res.ok) {
+                    document.getElementById('profileName').value = data.name || '';
+                    document.getElementById('profileEmail').value = data.email || '';
+                    document.getElementById('profilePhone').value = data.phone || '';
+                }
+            } catch {}
+        }
+
+        async function saveProfile() {
+            const msg = document.getElementById('profileMsg');
+            try {
+                const res = await fetch(`${API_URL}/auth/profile`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
+                    body: JSON.stringify({ name: document.getElementById('profileName').value, phone: document.getElementById('profilePhone').value })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    const user = getUser(); user.name = data.name; localStorage.setItem('user', JSON.stringify(user));
+                    document.getElementById('userName').textContent = data.name;
+                    document.getElementById('welcomeName').textContent = data.name;
+                    msg.className = 'msg ok'; msg.textContent = 'Profile updated!';
+                } else { msg.className = 'msg err'; msg.textContent = data.message; }
+            } catch { msg.className = 'msg err'; msg.textContent = 'Error saving profile'; }
+        }
+
+        async function changePassword() {
+            const msg = document.getElementById('passwordMsg');
+            try {
+                const res = await fetch(`${API_URL}/auth/change-password`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
+                    body: JSON.stringify({ currentPassword: document.getElementById('currentPassword').value, newPassword: document.getElementById('newPassword').value })
+                });
+                const data = await res.json();
+                msg.className = res.ok ? 'msg ok' : 'msg err';
+                msg.textContent = data.message;
+                if (res.ok) { document.getElementById('currentPassword').value = ''; document.getElementById('newPassword').value = ''; }
+            } catch { msg.className = 'msg err'; msg.textContent = 'Error updating password'; }
+        }
+
+        async function loadOrders() {
+            const list = document.getElementById('ordersList');
+            try {
+                const res = await fetch(`${API_URL}/payments/my-orders`, { headers: { Authorization: `Bearer ${getToken()}` } });
+                const orders = await res.json();
+                if (!orders.length) {
+                    list.innerHTML = '<div class="empty-state"><i class="fas fa-inbox"></i><p>No orders yet</p><a href="/products.html" style="color:#a855f7;font-weight:600;">Shop now →</a></div>';
+                    return;
+                }
+                list.innerHTML = orders.map(o => `
+                    <div class="order-row">
+                        <div>
+                            <strong>#${o._id.toString().slice(-8).toUpperCase()}</strong>
+                            <div style="font-size:13px;color:#64748b;margin-top:4px;">${o.items.map(i => i.name).join(', ')}</div>
+                            <div style="font-size:12px;color:#94a3b8;">${new Date(o.createdAt).toLocaleDateString()}</div>
+                        </div>
+                        <div style="text-align:right;">
+                            <div style="font-weight:700;color:#a855f7;">$${o.totalAmount.toFixed(2)}</div>
+                            <span class="order-status status-${o.status}">${o.status}</span>
+                        </div>
+                    </div>
+                `).join('');
+            } catch {
+                list.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Error loading orders</p></div>';
+            }
+        }
+
+        function buyProduct(productId) {
+            const product = productsCache[productId];
+            if (!product) return;
+            AzlanCart.addItem(product);
+            window.location.href = '/checkout.html';
+        }
+
+        const productsCache = {};
 
         function getToken() { return localStorage.getItem('token'); }
         function getUser() {
@@ -229,13 +396,17 @@
                 const products = await res.json();
                 const list = document.getElementById('productList');
                 if (products.length === 0) {
-                    list.innerHTML = `<div class="empty-state"><i class="fas fa-box-open"></i><p>No products available</p></div>`;
+                    list.innerHTML = `<div class="empty-state"><i class="fas fa-box-open"></i><p>No products available</p><a href="/products.html" style="color:#a855f7;font-weight:600;margin-top:8px;display:inline-block;">Browse products →</a></div>`;
                 } else {
+                    products.forEach(p => { productsCache[p._id] = p; });
                     list.innerHTML = products.map(p => `
                         <div class="product-item">
-                            <span class="name">${p.name}</span>
+                            <a href="/products.html" class="name" style="color:inherit;text-decoration:none;">${p.name}</a>
                             <span class="price">$${p.price}</span>
                             <span class="status">Available</span>
+                            <button class="btn-buy" onclick="buyProduct('${p._id}')">
+                                <i class="fas fa-cart-plus"></i> Buy Now
+                            </button>
                         </div>
                     `).join('');
                 }

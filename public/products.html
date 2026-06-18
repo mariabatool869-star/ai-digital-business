@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>All Products - AzlanAI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <style>
+        :root {
+            --primary: #2563eb;
+            --purple: #a855f7;
+            --text: #0f172a;
+            --text-muted: #64748b;
+            --white: #ffffff;
+            --border: #e2e8f0;
+            --surface: #f8fafc;
+            --radius: 0.625rem;
+            --radius-lg: 1rem;
+            --shadow: 0 1px 3px rgba(15, 23, 42, .06);
+            --gradient: linear-gradient(90deg, #2dd4bf, #a855f7);
+            --font: 'Inter', system-ui, sans-serif;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: var(--font); color: var(--text); background: var(--surface); line-height: 1.6; }
+        a { color: inherit; text-decoration: none; }
+        .container { max-width: 80rem; margin: 0 auto; padding: 0 1.5rem; }
+        .gradient-text {
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .topbar {
+            background: #050714; padding: 14px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+        .topbar .inner {
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
+        }
+        .logo { font-size: 1.125rem; font-weight: 800; color: #fff; display: flex; align-items: center; gap: 10px; }
+        .logo i { color: var(--purple); }
+        .logo span { color: var(--purple); }
+        .topbar-actions { display: flex; align-items: center; gap: 12px; }
+        .cart-link { position: relative; color: #cbd5e1; font-size: 1.125rem; padding: 8px; }
+        .cart-badge {
+            position: absolute; top: 0; right: 0;
+            background: var(--gradient); color: #fff;
+            font-size: .625rem; font-weight: 700;
+            width: 18px; height: 18px; border-radius: 50%;
+            display: none; align-items: center; justify-content: center;
+        }
+        .btn {
+            padding: .5rem 1rem; border-radius: var(--radius);
+            font-size: .875rem; font-weight: 600; transition: .15s;
+            font-family: var(--font); cursor: pointer; border: none;
+        }
+        .btn-outline { background: transparent; color: #cbd5e1; border: 1px solid #475569; }
+        .btn-outline:hover { color: #fff; border-color: #94a3b8; }
+        .btn-primary { background: var(--gradient); color: #fff; }
+        .btn-primary:hover { transform: scale(1.02); }
+
+        .page-header { padding: 3rem 0 2rem; text-align: center; }
+        .page-header h1 { font-size: 2.25rem; font-weight: 800; margin-bottom: .5rem; }
+        .page-header p { color: var(--text-muted); max-width: 36rem; margin: 0 auto; }
+        .back-link {
+            display: inline-flex; align-items: center; gap: 6px;
+            color: var(--text-muted); font-size: .875rem; margin-bottom: 1rem;
+        }
+        .back-link:hover { color: var(--text); }
+
+        .filters {
+            display: flex; flex-wrap: wrap; gap: .5rem;
+            justify-content: center; margin-bottom: 2rem;
+        }
+        .filter-btn {
+            padding: .5rem 1rem; border-radius: 9999px;
+            border: 1px solid var(--border); background: var(--white);
+            font-size: .8125rem; font-weight: 600; cursor: pointer;
+            font-family: var(--font); color: var(--text-muted); transition: .15s;
+        }
+        .filter-btn:hover { border-color: var(--purple); color: var(--purple); }
+        .filter-btn.active {
+            background: var(--gradient); color: #fff; border-color: transparent;
+        }
+
+        .products-grid {
+            display: grid; gap: 1.5rem;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            margin-bottom: 3rem;
+        }
+
+        .product-card {
+            background: var(--white); border: 1px solid var(--border);
+            border-radius: var(--radius-lg); padding: 1.5rem;
+            box-shadow: var(--shadow); transition: box-shadow .2s, transform .2s;
+            display: flex; flex-direction: column;
+        }
+        .product-card:hover {
+            box-shadow: 0 10px 30px rgba(15, 23, 42, .08);
+            transform: translateY(-4px);
+        }
+        .product-type {
+            font-size: .625rem; font-weight: 700; text-transform: uppercase;
+            color: var(--primary); background: rgba(37, 99, 235, .08);
+            padding: .25rem .75rem; border-radius: 9999px;
+            display: inline-block; letter-spacing: .05em; align-self: flex-start;
+        }
+        .product-name { font-size: 1rem; font-weight: 600; margin-top: .75rem; }
+        .product-desc {
+            font-size: .8125rem; color: var(--text-muted);
+            margin-top: .5rem; flex: 1; line-height: 1.5;
+        }
+        .product-features {
+            margin-top: .75rem; font-size: .75rem; color: var(--text-muted);
+        }
+        .product-features li {
+            padding: .15rem 0; display: flex; align-items: center; gap: 6px;
+        }
+        .product-features li i { color: #22c55e; font-size: .625rem; }
+        .product-price {
+            font-size: 1.25rem; font-weight: 700; color: var(--primary); margin-top: 1rem;
+        }
+        .product-price span { font-size: .875rem; font-weight: 400; color: var(--text-muted); }
+        .btn-small {
+            background: var(--gradient); color: var(--white); border: none;
+            padding: .625rem 1rem; border-radius: var(--radius);
+            font-size: .8125rem; font-weight: 600; cursor: pointer;
+            width: 100%; transition: .2s; font-family: var(--font); margin-top: 1rem;
+        }
+        .btn-small:hover { transform: scale(1.02); box-shadow: 0 4px 16px rgba(45, 212, 191, .3); }
+
+        .product-count {
+            text-align: center; color: var(--text-muted);
+            font-size: .875rem; margin-bottom: 1.5rem;
+        }
+        .search-bar {
+            display: flex; max-width: 32rem; margin: 0 auto 1.5rem;
+            border: 1px solid var(--border); border-radius: var(--radius-lg);
+            overflow: hidden; background: var(--white);
+            box-shadow: var(--shadow);
+        }
+        .search-bar input {
+            flex: 1; border: none; padding: .875rem 1.25rem;
+            font-size: .9375rem; font-family: var(--font); outline: none;
+        }
+        .search-bar button {
+            background: var(--gradient); border: none; color: #fff;
+            padding: .875rem 1.25rem; cursor: pointer; font-weight: 600;
+        }
+        .loading-state, .error-state, .empty-state {
+            text-align: center; padding: 4rem 1rem; color: var(--text-muted);
+        }
+        .loading-state i { font-size: 2rem; color: var(--primary); animation: spin 1.5s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .error-state { color: #ef4444; }
+
+        .footer {
+            background: #050714; color: #94a3b8;
+            text-align: center; padding: 2rem; font-size: .75rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="topbar">
+        <div class="container inner">
+            <a href="/" class="logo"><i class="fas fa-crown"></i> Azlan<span>AI</span></a>
+            <div class="topbar-actions">
+                <a href="/checkout.html" class="cart-link" title="Cart">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-badge">0</span>
+                </a>
+                <a href="/auth.html" class="btn btn-outline">Login</a>
+                <a href="/checkout.html" class="btn btn-primary">Checkout</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="page-header">
+            <a href="/" class="back-link"><i class="fas fa-arrow-left"></i> Back to Home</a>
+            <h1>All <span class="gradient-text">Products</span></h1>
+            <p>Browse our full catalog — domains, hosting, AI agents, and development services.</p>
+        </div>
+
+        <form class="search-bar" onsubmit="handleSearch(event)">
+            <input type="text" id="searchInput" placeholder="Search products by name, type, or feature..." autocomplete="off" />
+            <button type="submit"><i class="fas fa-search"></i></button>
+        </form>
+
+        <div class="filters" id="filters">
+            <button class="filter-btn active" data-type="all">All</button>
+            <button class="filter-btn" data-type="domain">Domains</button>
+            <button class="filter-btn" data-type="hosting">Hosting</button>
+            <button class="filter-btn" data-type="email">Email</button>
+            <button class="filter-btn" data-type="ai_agent">AI Agents</button>
+            <button class="filter-btn" data-type="website_dev">Website Dev</button>
+            <button class="filter-btn" data-type="deployment">Deployment</button>
+        </div>
+
+        <p class="product-count" id="productCount"></p>
+
+        <div id="products-container">
+            <div class="loading-state"><i class="fas fa-spinner"></i><p>Loading products...</p></div>
+        </div>
+    </main>
+
+    <footer class="footer">&copy; 2026 AzlanAI. All rights reserved.</footer>
+
+    <script src="/js/cart.js"></script>
+    <script>
+        const API_BASE = window.location.hostname === 'localhost'
+            ? 'http://localhost:5000/api'
+            : 'https://ai-digital-business.vercel.app/api';
+
+        let allProducts = [];
+        let activeFilter = 'all';
+        let searchQuery = '';
+        const productsCache = {};
+
+        const TYPE_LABELS = {
+            domain: 'Domain',
+            hosting: 'Hosting',
+            email: 'Email',
+            ai_agent: 'AI Agent',
+            website_dev: 'Website Dev',
+            deployment: 'Deployment'
+        };
+
+        function addToCart(productId) {
+            const product = productsCache[productId];
+            if (!product) return;
+            AzlanCart.addItem(product);
+            const btn = event.target;
+            const original = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check"></i> Added!';
+            btn.style.background = '#22c55e';
+            setTimeout(() => {
+                btn.innerHTML = original;
+                btn.style.background = '';
+            }, 1500);
+        }
+
+        function renderProducts(products) {
+            const container = document.getElementById('products-container');
+            const countEl = document.getElementById('productCount');
+
+            if (!products.length) {
+                const msg = searchQuery
+                    ? `No products found for "${searchQuery}".`
+                    : 'No products in this category.';
+                container.innerHTML = `<div class="empty-state"><i class="fas fa-box-open" style="font-size:2rem;margin-bottom:1rem;display:block;"></i><p>${msg}</p><a href="/products.html" style="color:var(--purple);font-weight:600;margin-top:12px;display:inline-block;">View all products →</a></div>`;
+                countEl.textContent = '';
+                return;
+            }
+
+            countEl.textContent = `Showing ${products.length} product${products.length !== 1 ? 's' : ''}`;
+
+            container.innerHTML = `
+                <div class="products-grid">
+                    ${products.map(p => {
+                        const features = (p.features || []).slice(0, 3);
+                        return `
+                            <div class="product-card">
+                                <span class="product-type">${(TYPE_LABELS[p.type] || p.type).toUpperCase()}</span>
+                                <div class="product-name">${p.name}</div>
+                                <p class="product-desc">${p.description || ''}</p>
+                                ${features.length ? `
+                                    <ul class="product-features">
+                                        ${features.map(f => `<li><i class="fas fa-check"></i> ${f}</li>`).join('')}
+                                    </ul>
+                                ` : ''}
+                                <div class="product-price">$${p.price} <span>/mo</span></div>
+                                <button class="btn-small" onclick="addToCart('${p._id}')">
+                                    <i class="fas fa-cart-plus"></i> Add to Cart
+                                </button>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+        }
+
+        function applyFilters() {
+            let filtered = activeFilter === 'all'
+                ? allProducts
+                : allProducts.filter(p => p.type === activeFilter);
+
+            if (searchQuery) {
+                const q = searchQuery.toLowerCase();
+                filtered = filtered.filter(p =>
+                    p.name.toLowerCase().includes(q) ||
+                    p.type.toLowerCase().includes(q) ||
+                    (p.description || '').toLowerCase().includes(q) ||
+                    (p.features || []).some(f => f.toLowerCase().includes(q))
+                );
+            }
+
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.type === activeFilter);
+            });
+
+            renderProducts(filtered);
+        }
+
+        function filterProducts(type) {
+            activeFilter = type;
+            applyFilters();
+        }
+
+        function handleSearch(e) {
+            e.preventDefault();
+            searchQuery = document.getElementById('searchInput').value.trim();
+            const params = new URLSearchParams();
+            if (activeFilter !== 'all') params.set('type', activeFilter);
+            if (searchQuery) params.set('q', searchQuery);
+            const qs = params.toString();
+            history.replaceState(null, '', qs ? `?${qs}` : window.location.pathname);
+            applyFilters();
+        }
+
+        document.getElementById('filters').addEventListener('click', (e) => {
+            const btn = e.target.closest('.filter-btn');
+            if (btn) filterProducts(btn.dataset.type);
+        });
+
+        async function loadProducts() {
+            const container = document.getElementById('products-container');
+            try {
+                const res = await fetch(`${API_BASE}/products`);
+                if (!res.ok) throw new Error('Failed');
+                allProducts = await res.json();
+                allProducts.forEach(p => { productsCache[p._id] = p; });
+
+                if (!allProducts.length) {
+                    container.innerHTML = `<div class="empty-state"><i class="fas fa-box-open" style="font-size:2rem;margin-bottom:1rem;display:block;"></i><p>No products available yet.</p></div>`;
+                    return;
+                }
+
+                applyFilters();
+            } catch {
+                container.innerHTML = `<div class="error-state"><i class="fas fa-exclamation-triangle" style="font-size:2rem;margin-bottom:1rem;display:block;"></i><p>Error loading products. Please try again.</p></div>`;
+            }
+        }
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlType = urlParams.get('type');
+        const urlQuery = urlParams.get('q') || '';
+        const validTypes = ['all', 'domain', 'hosting', 'email', 'ai_agent', 'website_dev', 'deployment'];
+        if (validTypes.includes(urlType)) activeFilter = urlType;
+        if (urlQuery) {
+            searchQuery = urlQuery;
+            document.getElementById('searchInput').value = urlQuery;
+        }
+
+        loadProducts();
+    </script>
+    <script src="/js/chat-widget.js"></script>
+</body>
+</html>

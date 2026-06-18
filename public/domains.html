@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Domain Search - AzlanAI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <style>
+        * { box-sizing:border-box;margin:0;padding:0; }
+        body { font-family:'Inter',sans-serif;background:#f0f4f8;color:#0f172a; }
+        .topbar { background:#050714;padding:14px 32px;display:flex;justify-content:space-between;align-items:center; }
+        .logo { color:#fff;font-size:20px;font-weight:800;text-decoration:none;display:flex;align-items:center;gap:10px; }
+        .logo i { color:#a855f7; } .logo span { color:#a855f7; }
+        .container { max-width:800px;margin:0 auto;padding:40px 20px; }
+        h1 { font-size:32px;font-weight:800;text-align:center;margin-bottom:8px; }
+        .sub { text-align:center;color:#64748b;margin-bottom:32px; }
+        .search-box {
+            display:flex;background:#fff;border:2px solid #e2e8f0;border-radius:14px;overflow:hidden;
+            box-shadow:0 4px 20px rgba(0,0,0,0.06);margin-bottom:32px;
+        }
+        .search-box:focus-within { border-color:#a855f7; }
+        .search-box input { flex:1;border:none;padding:16px 20px;font-size:16px;outline:none;font-family:inherit; }
+        .search-box button {
+            background:linear-gradient(90deg,#2dd4bf,#a855f7);color:#fff;border:none;
+            padding:16px 28px;font-weight:700;cursor:pointer;font-family:inherit;
+        }
+        .results { display:grid;gap:12px; }
+        .domain-card {
+            background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:18px 20px;
+            display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;
+        }
+        .domain-name { font-size:18px;font-weight:700; }
+        .available { color:#22c55e;font-size:13px;font-weight:600; }
+        .taken { color:#ef4444;font-size:13px;font-weight:600; }
+        .domain-price { color:#a855f7;font-weight:700;font-size:18px; }
+        .btn-buy {
+            background:linear-gradient(90deg,#2dd4bf,#a855f7);color:#fff;border:none;
+            padding:8px 18px;border-radius:8px;font-weight:600;cursor:pointer;font-family:inherit;
+        }
+        .btn-buy:disabled { opacity:0.5;cursor:not-allowed; }
+        .back { color:#64748b;text-decoration:none;font-size:14px;display:inline-block;margin-bottom:20px; }
+    </style>
+</head>
+<body>
+    <div class="topbar">
+        <a href="/" class="logo"><i class="fas fa-crown"></i> Azlan<span>AI</span></a>
+        <a href="/products.html" style="color:#cbd5e1;text-decoration:none;font-size:14px;">All Products</a>
+    </div>
+    <div class="container">
+        <a href="/" class="back"><i class="fas fa-arrow-left"></i> Back to Home</a>
+        <h1>Find Your <span style="background:linear-gradient(90deg,#2dd4bf,#a855f7);-webkit-background-clip:text;background-clip:text;color:transparent;">Domain</span></h1>
+        <p class="sub">Search availability across popular TLDs and buy instantly</p>
+        <form class="search-box" onsubmit="searchDomains(event)">
+            <input type="text" id="domainInput" placeholder="Enter your business name (e.g. mystore)" required />
+            <button type="submit"><i class="fas fa-search"></i> Search</button>
+        </form>
+        <div class="results" id="results"></div>
+    </div>
+    <script src="/js/cart.js"></script>
+    <script>
+        const API = window.location.hostname === 'localhost' ? 'http://localhost:5000/api' : 'https://ai-digital-business.vercel.app/api';
+
+        async function searchDomains(e) {
+            e.preventDefault();
+            const name = document.getElementById('domainInput').value.trim();
+            const container = document.getElementById('results');
+            container.innerHTML = '<p style="text-align:center;color:#64748b;">Searching...</p>';
+            try {
+                const res = await fetch(`${API}/domains/search-all?name=${encodeURIComponent(name)}`);
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.message);
+                container.innerHTML = data.map(d => `
+                    <div class="domain-card">
+                        <div>
+                            <div class="domain-name">${d.domain}</div>
+                            <div class="${d.available ? 'available' : 'taken'}">
+                                <i class="fas fa-${d.available ? 'check-circle' : 'times-circle'}"></i>
+                                ${d.available ? 'Available' : 'Taken'}
+                            </div>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:16px;">
+                            <span class="domain-price">$${d.price}/yr</span>
+                            <button class="btn-buy" ${d.available ? '' : 'disabled'}
+                                onclick="buyDomain('${d.domain}', ${d.price})">
+                                ${d.available ? 'Add to Cart' : 'Unavailable'}
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (err) {
+                container.innerHTML = `<p style="text-align:center;color:#ef4444;">${err.message}</p>`;
+            }
+        }
+
+        function buyDomain(domain, price) {
+            fetch(`${API}/products/type/domain`).then(r => r.json()).then(products => {
+                const product = products[0];
+                if (!product) { alert('Domain product not available'); return; }
+                AzlanCart.addItem({ ...product, name: domain + ' Domain Registration', price: price });
+                if (confirm(domain + ' added to cart! Go to checkout?')) {
+                    window.location.href = '/checkout.html';
+                }
+            });
+        }
+
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('name')) {
+            document.getElementById('domainInput').value = params.get('name');
+            searchDomains(new Event('submit'));
+        }
+    </script>
+    <script src="/js/chat-widget.js"></script>
+</body>
+</html>

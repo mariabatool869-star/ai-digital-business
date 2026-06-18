@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Checkout - AzlanAI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #f0f4f8; color: #0f172a; min-height: 100vh; }
+
+        .topbar {
+            background: #fff; border-bottom: 1px solid #e2e8f0;
+            padding: 14px 32px; display: flex; justify-content: space-between; align-items: center;
+        }
+        .logo { font-size: 20px; font-weight: 800; display: flex; align-items: center; gap: 10px; text-decoration: none; color: #0f172a; }
+        .logo i { color: #a855f7; }
+        .logo span { color: #a855f7; }
+
+        .container { max-width: 900px; margin: 0 auto; padding: 32px 20px; }
+        h1 { font-size: 28px; font-weight: 800; margin-bottom: 8px; }
+        .subtitle { color: #64748b; margin-bottom: 28px; }
+
+        .checkout-grid { display: grid; grid-template-columns: 1fr 340px; gap: 24px; }
+        @media (max-width: 768px) { .checkout-grid { grid-template-columns: 1fr; } }
+
+        .card { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; }
+        .card h2 { font-size: 18px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+        .card h2 i { color: #a855f7; }
+
+        .cart-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 14px 0; border-bottom: 1px solid #e2e8f0; gap: 12px; flex-wrap: wrap;
+        }
+        .cart-item:last-child { border-bottom: none; }
+        .cart-item .info { flex: 1; }
+        .cart-item .name { font-weight: 600; }
+        .cart-item .type { font-size: 12px; color: #64748b; text-transform: uppercase; }
+        .cart-item .price { color: #a855f7; font-weight: 700; }
+
+        .qty-controls { display: flex; align-items: center; gap: 8px; }
+        .qty-btn {
+            width: 28px; height: 28px; border: 1px solid #e2e8f0; background: #fff;
+            border-radius: 6px; cursor: pointer; font-weight: 700; color: #64748b;
+        }
+        .qty-btn:hover { background: #f8fafc; }
+        .qty-val { font-weight: 600; min-width: 20px; text-align: center; }
+        .btn-remove { background: none; border: none; color: #ef4444; cursor: pointer; font-size: 14px; }
+
+        .summary-row { display: flex; justify-content: space-between; padding: 8px 0; color: #64748b; }
+        .summary-row.total { font-size: 20px; font-weight: 800; color: #0f172a; border-top: 1px solid #e2e8f0; margin-top: 8px; padding-top: 16px; }
+        .summary-row.total .amount { color: #a855f7; }
+
+        .btn-pay {
+            width: 100%; margin-top: 20px; padding: 14px;
+            background: linear-gradient(90deg, #2dd4bf, #a855f7);
+            color: #fff; border: none; border-radius: 10px;
+            font-size: 16px; font-weight: 700; cursor: pointer;
+            font-family: 'Inter', sans-serif; transition: all 0.2s;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .btn-pay:hover { transform: scale(1.02); box-shadow: 0 4px 20px rgba(168,85,247,0.3); }
+        .btn-pay:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+        .secure-note { text-align: center; margin-top: 12px; font-size: 12px; color: #94a3b8; }
+        .secure-note i { color: #22c55e; }
+
+        .empty-cart { text-align: center; padding: 48px 20px; color: #94a3b8; }
+        .empty-cart i { font-size: 48px; margin-bottom: 16px; color: #e2e8f0; }
+        .btn-shop {
+            display: inline-block; margin-top: 16px; padding: 10px 24px;
+            background: linear-gradient(90deg, #2dd4bf, #a855f7);
+            color: #fff; text-decoration: none; border-radius: 8px; font-weight: 600;
+        }
+
+        .alert { padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; }
+        .alert-error { background: rgba(239,68,68,0.1); color: #ef4444; border: 1px solid rgba(239,68,68,0.2); }
+        .alert-info { background: rgba(59,130,246,0.1); color: #3b82f6; border: 1px solid rgba(59,130,246,0.2); }
+
+        .user-info { font-size: 14px; color: #64748b; margin-bottom: 16px; }
+        .user-info strong { color: #0f172a; }
+    </style>
+</head>
+<body>
+
+    <div class="topbar">
+        <a href="/" class="logo"><i class="fas fa-crown"></i> Azlan<span>AI</span></a>
+        <a href="/products.html" style="color:#64748b;text-decoration:none;font-size:14px;"><i class="fas fa-arrow-left"></i> Continue Shopping</a>
+    </div>
+
+    <div class="container">
+        <h1>Checkout</h1>
+        <p class="subtitle">Review your order and pay securely with Stripe</p>
+
+        <div id="alertBox"></div>
+
+        <div class="checkout-grid" id="checkoutContent">
+            <div class="card">
+                <h2><i class="fas fa-shopping-bag"></i> Your Cart</h2>
+                <div id="cartItems"><p style="color:#94a3b8;">Loading...</p></div>
+            </div>
+            <div class="card">
+                <h2><i class="fas fa-receipt"></i> Order Summary</h2>
+                <div class="user-info" id="userInfo"></div>
+                <div class="summary-row"><span>Subtotal</span><span id="subtotal">$0.00</span></div>
+                <div class="summary-row"><span>Tax</span><span>$0.00</span></div>
+                <div class="summary-row total"><span>Total</span><span class="amount" id="total">$0.00</span></div>
+                <button class="btn-pay" id="payBtn" onclick="startCheckout()" disabled>
+                    <i class="fas fa-lock"></i> Pay with Card
+                </button>
+                <p class="secure-note"><i class="fas fa-shield-alt"></i> Secured by Stripe. We never store your card details.</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/cart.js"></script>
+    <script>
+        const API_URL = window.location.hostname === 'localhost'
+            ? 'http://localhost:5000/api'
+            : 'https://ai-digital-business.vercel.app/api';
+
+        function getToken() { return localStorage.getItem('token'); }
+        function getUser() {
+            try { return JSON.parse(localStorage.getItem('user')); } catch { return null; }
+        }
+
+        function formatPrice(n) { return '$' + n.toFixed(2); }
+
+        function showAlert(msg, type) {
+            document.getElementById('alertBox').innerHTML = `<div class="alert alert-${type}">${msg}</div>`;
+        }
+
+        function renderCart() {
+            const items = AzlanCart.getItems();
+            const container = document.getElementById('cartItems');
+            const payBtn = document.getElementById('payBtn');
+
+            if (items.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-cart">
+                        <i class="fas fa-shopping-cart"></i>
+                        <p>Your cart is empty</p>
+                        <a href="/products.html" class="btn-shop">Browse Products</a>
+                    </div>`;
+                document.getElementById('subtotal').textContent = '$0.00';
+                document.getElementById('total').textContent = '$0.00';
+                payBtn.disabled = true;
+                return;
+            }
+
+            container.innerHTML = items.map(item => `
+                <div class="cart-item">
+                    <div class="info">
+                        <div class="name">${item.name}</div>
+                        <div class="type">${item.type.replace('_', ' ')}</div>
+                    </div>
+                    <div class="qty-controls">
+                        <button class="qty-btn" onclick="changeQty('${item.productId}', ${item.quantity - 1})">−</button>
+                        <span class="qty-val">${item.quantity}</span>
+                        <button class="qty-btn" onclick="changeQty('${item.productId}', ${item.quantity + 1})">+</button>
+                    </div>
+                    <div class="price">${formatPrice(item.price * item.quantity)}</div>
+                    <button class="btn-remove" onclick="removeFromCart('${item.productId}')" title="Remove"><i class="fas fa-trash"></i></button>
+                </div>
+            `).join('');
+
+            const total = AzlanCart.getTotal();
+            document.getElementById('subtotal').textContent = formatPrice(total);
+            document.getElementById('total').textContent = formatPrice(total);
+            payBtn.disabled = false;
+        }
+
+        function changeQty(id, qty) {
+            AzlanCart.updateQuantity(id, qty);
+            renderCart();
+        }
+
+        function removeFromCart(id) {
+            AzlanCart.removeItem(id);
+            renderCart();
+        }
+
+        async function startCheckout() {
+            const token = getToken();
+            if (!token) {
+                showAlert('Please <a href="/auth.html" style="color:inherit;font-weight:700;">login</a> to complete your purchase.', 'info');
+                setTimeout(() => window.location.href = '/auth.html', 2000);
+                return;
+            }
+
+            const payBtn = document.getElementById('payBtn');
+            payBtn.disabled = true;
+            payBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Redirecting to Stripe...';
+
+            try {
+                const res = await fetch(`${API_URL}/payments/create-checkout-session`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ items: AzlanCart.getItems() })
+                });
+
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.message || 'Checkout failed');
+
+                window.location.href = data.url;
+            } catch (err) {
+                showAlert('❌ ' + err.message, 'error');
+                payBtn.disabled = false;
+                payBtn.innerHTML = '<i class="fas fa-lock"></i> Pay with Card';
+            }
+        }
+
+        function init() {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('cancelled') === 'true') {
+                showAlert('Payment was cancelled. Your cart items are still saved.', 'info');
+            }
+
+            const user = getUser();
+            if (user) {
+                document.getElementById('userInfo').innerHTML =
+                    `Ordering as <strong>${user.name}</strong> (${user.email})`;
+            } else {
+                document.getElementById('userInfo').innerHTML =
+                    '<a href="/auth.html" style="color:#a855f7;">Login</a> required to checkout';
+            }
+
+            renderCart();
+        }
+
+        init();
+    </script>
+</body>
+</html>
