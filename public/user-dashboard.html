@@ -107,8 +107,10 @@
 </div>
 
 <script>
-    // ✅ FIXED: Use localhost
-    const API_URL = 'http://localhost:5000/api';
+    // ✅ FIXED: Works on both localhost and Vercel
+    const API_URL = window.location.hostname === 'localhost' 
+        ? 'http://localhost:5000/api' 
+        : 'https://ai-digital-business.vercel.app/api';
 
     function getToken() { return localStorage.getItem('token'); }
     function getUser() {
@@ -121,7 +123,6 @@
         window.location.href = '/auth.html';
     }
 
-    // ✅ FIXED: Check role properly
     function checkAuth() {
         const token = getToken();
         const user = getUser();
@@ -131,7 +132,6 @@
             return false;
         }
         
-        // If user IS admin, go to admin dashboard
         if (user.role === 'admin') {
             window.location.href = '/dashboard.html';
             return false;

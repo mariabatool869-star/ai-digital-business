@@ -102,7 +102,6 @@
             <button class="auth-tab" onclick="switchTab('register')">Register</button>
         </div>
 
-        <!-- Login Form -->
         <div class="auth-form active" id="loginForm">
             <form onsubmit="login(event)">
                 <div class="form-group">
@@ -118,7 +117,6 @@
             </form>
         </div>
 
-        <!-- Register Form -->
         <div class="auth-form" id="registerForm">
             <form onsubmit="register(event)">
                 <div class="form-group">
@@ -142,7 +140,10 @@
     </div>
 
     <script>
-        const API_URL = 'http://localhost:5000/api/auth';
+        // ✅ FIXED: Works on both localhost and Vercel
+        const API_URL = window.location.hostname === 'localhost' 
+            ? 'http://localhost:5000/api/auth' 
+            : 'https://ai-digital-business.vercel.app/api/auth';
 
         function switchTab(tab) {
             document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
@@ -162,7 +163,6 @@
             el.className = 'auth-message ' + type;
         }
 
-        // ===== LOGIN =====
         async function login(e) {
             e.preventDefault();
             const email = document.getElementById('loginEmail').value;
@@ -178,8 +178,6 @@
                     localStorage.setItem('token', data.token);
                     localStorage.setItem('user', JSON.stringify(data));
                     showMessage('loginMessage', '✅ Login successful! Redirecting...', 'success');
-
-                    // ✅ CHECK ROLE AND REDIRECT
                     if (data.role === 'admin') {
                         setTimeout(() => window.location.href = '/dashboard.html', 1500);
                     } else {
@@ -193,7 +191,6 @@
             }
         }
 
-        // ===== REGISTER =====
         async function register(e) {
             e.preventDefault();
             const name = document.getElementById('registerName').value;
