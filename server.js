@@ -27,9 +27,5 @@ const productRoutes = require('./src/routes/productRoutes');
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 
-// Start server
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`✅ Server running on http://localhost:${PORT}`);
-  console.log(`✅ Open http://localhost:${PORT} to see your website`);
-});
+// ✅ FIXED: For Vercel, export the app instead of listening
+module.exports = app;
