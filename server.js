@@ -8,8 +8,13 @@ const path = require('path');
 
 const app = express();
 
-// Middleware
-app.use(cors());
+// ✅ FIXED CORS for HTTPS
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use(express.json());
 
 // Serve static files from "public" folder
@@ -27,5 +32,5 @@ const productRoutes = require('./src/routes/productRoutes');
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 
-// ✅ FIXED: For Vercel, export the app instead of listening
+// ✅ FIXED: For Vercel, export the app
 module.exports = app;
