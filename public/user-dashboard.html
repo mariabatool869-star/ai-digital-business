@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>My Account - AzlanAI</title>
+    <title>My Dashboard - AzlanAI</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: #f8fafc; color: #0f172a; }
+        body { font-family: 'Inter', sans-serif; background: #f0f4f8; color: #0f172a; }
 
+        /* ===== TOP BAR ===== */
         .topbar {
             background: #fff; border-bottom: 1px solid #e2e8f0;
             padding: 12px 32px; display: flex; justify-content: space-between; align-items: center;
@@ -32,35 +33,66 @@
         }
         .topbar .user-section .btn-logout:hover { background: rgba(239,68,68,0.2); }
 
+        /* ===== MAIN ===== */
         .main { max-width: 1100px; margin: 0 auto; padding: 32px; }
         .main .header { margin-bottom: 24px; }
         .main .header h1 { font-size: 28px; font-weight: 800; }
         .main .header p { color: #64748b; }
         .main .badge { display: inline-block; background: rgba(168,85,247,0.1); color: #a855f7; padding: 2px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; }
 
+        /* ===== QUICK STATS ===== */
         .stats-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 32px; }
         .stat-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; }
         .stat-card .number { font-size: 28px; font-weight: 800; color: #0f172a; }
         .stat-card .label { color: #64748b; font-size: 13px; margin-top: 4px; }
         .stat-card .icon { font-size: 20px; color: #a855f7; margin-bottom: 8px; }
 
-        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
-        .product-card {
-            background: #fff; border: 1px solid #e2e8f0; border-radius: 12px;
-            padding: 20px; transition: all 0.3s;
-        }
-        .product-card:hover { box-shadow: 0 8px 25px rgba(0,0,0,0.06); transform: translateY(-2px); }
-        .product-card .name { font-weight: 600; font-size: 16px; }
-        .product-card .price { color: #a855f7; font-weight: 700; font-size: 18px; margin: 8px 0; }
-        .product-card .type { font-size: 12px; color: #64748b; background: #f1f5f9; padding: 2px 10px; border-radius: 20px; display: inline-block; }
-        .product-card .btn-buy {
-            width: 100%; margin-top: 12px; padding: 8px; background: linear-gradient(90deg, #2dd4bf, #a855f7);
-            color: #fff; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.3s;
-        }
-        .product-card .btn-buy:hover { transform: scale(1.02); }
+        /* ===== SERVICE CARDS ===== */
+        .services-section { margin-bottom: 40px; }
+        .services-section h2 { font-size: 20px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+        .services-section h2 i { color: #a855f7; }
 
-        .empty-state { text-align: center; padding: 60px 20px; color: #94a3b8; }
-        .empty-state i { font-size: 48px; color: #e2e8f0; margin-bottom: 12px; }
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 16px;
+        }
+        .service-card {
+            background: #fff; border: 1px solid #e2e8f0; border-radius: 12px;
+            padding: 24px 20px; text-align: center; transition: all 0.3s;
+        }
+        .service-card:hover { box-shadow: 0 8px 25px rgba(0,0,0,0.06); transform: translateY(-3px); }
+        .service-card .icon-circle {
+            width: 56px; height: 56px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 12px; font-size: 24px;
+        }
+        .icon-blue { background: rgba(59,130,246,0.12); color: #3b82f6; }
+        .icon-purple { background: rgba(168,85,247,0.12); color: #a855f7; }
+        .icon-green { background: rgba(34,197,94,0.12); color: #22c55e; }
+        .icon-orange { background: rgba(249,115,22,0.12); color: #f97316; }
+        .icon-cyan { background: rgba(6,182,212,0.12); color: #06b6d4; }
+        .icon-pink { background: rgba(236,72,153,0.12); color: #ec4899; }
+        .service-card h3 { font-size: 16px; font-weight: 700; }
+        .service-card p { color: #64748b; font-size: 13px; margin-top: 4px; line-height: 1.5; }
+        .service-card .tag {
+            display: inline-block; margin-top: 10px; font-size: 11px; font-weight: 600;
+            background: rgba(34,197,94,0.1); color: #22c55e; padding: 2px 12px; border-radius: 20px;
+        }
+
+        /* ===== PRODUCT LIST ===== */
+        .product-list { background: #fff; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden; }
+        .product-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 14px 20px; border-bottom: 1px solid #e2e8f0; flex-wrap: wrap; gap: 8px;
+        }
+        .product-item:last-child { border-bottom: none; }
+        .product-item .name { font-weight: 600; }
+        .product-item .price { color: #a855f7; font-weight: 600; }
+        .product-item .status { padding: 2px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; background: rgba(34,197,94,0.1); color: #22c55e; }
+
+        .empty-state { text-align: center; padding: 40px; color: #94a3b8; }
+        .empty-state i { font-size: 40px; color: #e2e8f0; margin-bottom: 12px; }
 
         .back-link { color: #64748b; text-decoration: none; font-size: 14px; transition: color 0.3s; }
         .back-link:hover { color: #0f172a; }
@@ -69,107 +101,152 @@
             .topbar { padding: 12px 16px; }
             .stats-grid { grid-template-columns: 1fr 1fr; }
             .main { padding: 16px; }
-            .product-grid { grid-template-columns: 1fr; }
+            .services-grid { grid-template-columns: 1fr 1fr; }
         }
+        @media (max-width: 480px) { .services-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
 
-<div class="topbar">
-    <div class="logo"><i class="fas fa-crown"></i> Azlan<span>AI</span></div>
-    <div class="user-section">
-        <span id="userName">User</span>
-        <div class="avatar" id="userAvatar">U</div>
-        <span class="badge" id="userRoleBadge">👤 User</span>
-        <button class="btn-logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
-    </div>
-</div>
-
-<div class="main">
-    <a href="/" class="back-link"><i class="fas fa-arrow-left"></i> Back to Home</a>
-
-    <div class="header">
-        <h1>Welcome Back, <span id="welcomeName">User</span>! 👋</h1>
-        <p>Explore our products and services</p>
+    <!-- ===== TOP BAR ===== -->
+    <div class="topbar">
+        <div class="logo"><i class="fas fa-crown"></i> Azlan<span>AI</span></div>
+        <div class="user-section">
+            <span id="userName">User</span>
+            <div class="avatar" id="userAvatar">U</div>
+            <span class="badge" id="userRoleBadge">👤 User</span>
+            <button class="btn-logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </div>
     </div>
 
-    <div class="stats-grid">
-        <div class="stat-card"><div class="icon"><i class="fas fa-box"></i></div><div class="number" id="totalProducts">0</div><div class="label">Products</div></div>
-        <div class="stat-card"><div class="icon"><i class="fas fa-shopping-cart"></i></div><div class="number">0</div><div class="label">My Orders</div></div>
-        <div class="stat-card"><div class="icon"><i class="fas fa-robot"></i></div><div class="number">5</div><div class="label">AI Agents</div></div>
-        <div class="stat-card"><div class="icon"><i class="fas fa-calendar"></i></div><div class="number" id="memberSince">Today</div><div class="label">Member Since</div></div>
+    <!-- ===== MAIN CONTENT ===== -->
+    <div class="main">
+
+        <a href="/" class="back-link"><i class="fas fa-arrow-left"></i> Back to Home</a>
+
+        <div class="header">
+            <h1>Welcome Back, <span id="welcomeName">User</span>! 👋</h1>
+            <p>Your all-in-one digital business platform</p>
+        </div>
+
+        <!-- ===== QUICK STATS ===== -->
+        <div class="stats-grid">
+            <div class="stat-card"><div class="icon"><i class="fas fa-box"></i></div><div class="number" id="totalProducts">0</div><div class="label">Products Available</div></div>
+            <div class="stat-card"><div class="icon"><i class="fas fa-robot"></i></div><div class="number">5</div><div class="label">AI Agents</div></div>
+            <div class="stat-card"><div class="icon"><i class="fas fa-globe"></i></div><div class="number">3</div><div class="label">Domains</div></div>
+            <div class="stat-card"><div class="icon"><i class="fas fa-calendar"></i></div><div class="number" id="memberSince">Today</div><div class="label">Member Since</div></div>
+        </div>
+
+        <!-- ===== SERVICES SECTION ===== -->
+        <div class="services-section">
+            <h2><i class="fas fa-bolt"></i> Your Services</h2>
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="icon-circle icon-purple"><i class="fas fa-robot"></i></div>
+                    <h3>AI Sales Agent</h3>
+                    <p>24/7 automated sales assistant</p>
+                    <span class="tag">Active</span>
+                </div>
+                <div class="service-card">
+                    <div class="icon-circle icon-blue"><i class="fas fa-headset"></i></div>
+                    <h3>AI Support Agent</h3>
+                    <p>Instant customer support</p>
+                    <span class="tag">Active</span>
+                </div>
+                <div class="service-card">
+                    <div class="icon-circle icon-green"><i class="fas fa-chart-line"></i></div>
+                    <h3>AI Marketing Agent</h3>
+                    <p>Smart marketing automation</p>
+                    <span class="tag">Active</span>
+                </div>
+                <div class="service-card">
+                    <div class="icon-circle icon-orange"><i class="fas fa-code"></i></div>
+                    <h3>AI Developer Agent</h3>
+                    <p>Code & deployment assistant</p>
+                    <span class="tag">Active</span>
+                </div>
+                <div class="service-card">
+                    <div class="icon-circle icon-cyan"><i class="fas fa-chart-pie"></i></div>
+                    <h3>AI Analytics Agent</h3>
+                    <p>Business insights & reports</p>
+                    <span class="tag">Active</span>
+                </div>
+                <div class="service-card">
+                    <div class="icon-circle icon-pink"><i class="fas fa-server"></i></div>
+                    <h3>Hosting & Domains</h3>
+                    <p>Fast, reliable hosting</p>
+                    <span class="tag">Active</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== PRODUCTS ===== -->
+        <h2 style="font-size:20px;font-weight:700;margin-bottom:16px;"><i class="fas fa-cube" style="color:#a855f7;"></i> Available Products</h2>
+        <div class="product-list" id="productList">
+            <div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>Loading products...</p></div>
+        </div>
+
     </div>
 
-    <h2 style="font-size:20px;font-weight:700;margin-bottom:16px;"><i class="fas fa-cube" style="color:#a855f7;"></i> Available Products</h2>
-    <div class="product-grid" id="productGrid">
-        <div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>Loading...</p></div>
-    </div>
-</div>
+    <script>
+        const API_URL = window.location.hostname === 'localhost'
+            ? 'http://localhost:5000/api'
+            : 'https://ai-digital-business.vercel.app/api';
 
-<script>
-    // ✅ FIXED: Works on both localhost and Vercel
-    const API_URL = window.location.hostname === 'localhost' 
-        ? 'http://localhost:5000/api' 
-        : 'https://ai-digital-business.vercel.app/api';
+        function getToken() { return localStorage.getItem('token'); }
+        function getUser() {
+            try { return JSON.parse(localStorage.getItem('user')); } catch { return null; }
+        }
 
-    function getToken() { return localStorage.getItem('token'); }
-    function getUser() {
-        try { return JSON.parse(localStorage.getItem('user')); } catch { return null; }
-    }
-
-    function logout() {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        window.location.href = '/auth.html';
-    }
-
-    function checkAuth() {
-        const token = getToken();
-        const user = getUser();
-        
-        if (!token || !user) {
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
             window.location.href = '/auth.html';
-            return false;
         }
-        
-        if (user.role === 'admin') {
-            window.location.href = '/dashboard.html';
-            return false;
-        }
-        
-        document.getElementById('userName').textContent = user.name || 'User';
-        document.getElementById('userAvatar').textContent = (user.name || 'U')[0].toUpperCase();
-        document.getElementById('welcomeName').textContent = user.name || 'User';
-        document.getElementById('memberSince').textContent = new Date(user.createdAt || Date.now()).toLocaleDateString();
-        return true;
-    }
 
-    async function loadDashboard() {
-        if (!checkAuth()) return;
-        try {
-            const res = await fetch(`${API_URL}/products`);
-            const products = await res.json();
-            const grid = document.getElementById('productGrid');
-            if (products.length === 0) {
-                grid.innerHTML = `<div class="empty-state"><i class="fas fa-box-open"></i><p>No products available</p></div>`;
-            } else {
-                grid.innerHTML = products.map(p => `
-                    <div class="product-card">
-                        <div class="type">${p.type}</div>
-                        <div class="name">${p.name}</div>
-                        <div class="price">$${p.price}</div>
-                        <button class="btn-buy" onclick="alert('🛒 ${p.name} - Coming soon!')"><i class="fas fa-cart-plus"></i> Buy Now</button>
-                    </div>
-                `).join('');
+        function checkAuth() {
+            const token = getToken();
+            const user = getUser();
+            if (!token || !user) {
+                window.location.href = '/auth.html';
+                return false;
             }
-            document.getElementById('totalProducts').textContent = products.length;
-        } catch (err) {
-            console.error('Error:', err);
-            document.getElementById('productGrid').innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Error loading products</p></div>`;
+            if (user.role === 'admin') {
+                window.location.href = '/dashboard.html';
+                return false;
+            }
+            document.getElementById('userName').textContent = user.name || 'User';
+            document.getElementById('userAvatar').textContent = (user.name || 'U')[0].toUpperCase();
+            document.getElementById('welcomeName').textContent = user.name || 'User';
+            document.getElementById('memberSince').textContent = new Date(user.createdAt || Date.now()).toLocaleDateString();
+            return true;
         }
-    }
 
-    loadDashboard();
-</script>
+        async function loadDashboard() {
+            if (!checkAuth()) return;
+            try {
+                const res = await fetch(`${API_URL}/products`);
+                const products = await res.json();
+                const list = document.getElementById('productList');
+                if (products.length === 0) {
+                    list.innerHTML = `<div class="empty-state"><i class="fas fa-box-open"></i><p>No products available</p></div>`;
+                } else {
+                    list.innerHTML = products.map(p => `
+                        <div class="product-item">
+                            <span class="name">${p.name}</span>
+                            <span class="price">$${p.price}</span>
+                            <span class="status">Available</span>
+                        </div>
+                    `).join('');
+                }
+                document.getElementById('totalProducts').textContent = products.length;
+            } catch {
+                document.getElementById('productList').innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Error loading products</p></div>`;
+            }
+        }
+
+        loadDashboard();
+    </script>
+
 </body>
 </html>
